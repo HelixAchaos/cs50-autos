@@ -35,7 +35,7 @@ mkcd () {
                 # cd $file_name # cd $file_name # cd with subprocess won't change shown terminal
                 exit 0
             fi
-        done; exit 1) && cd $file_name && open $file.c || echo "Heh, something shid up. Can't find the pset."
+        done; exit 1) && cd $file_name && open $file_name.c || echo "Heh, something shid up. Can't find the pset."
 
         # insert here
     else
