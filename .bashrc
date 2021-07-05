@@ -8,13 +8,34 @@
 
 
 mkcd () {
-    cwd=$PWD
-    file_name=$1
+    local cwd=$PWD
+    local file_name=$1
+    folder_name=$1
     # pset_problem_name wget?
     # mkdir "ps"+$1 // was going to do: p_number, p_prob_name, wget?
     if [[ $# > 1 && $2 == "-wget" ]]; then
         declare -a urls_list=()
+        local comfort_version=""
+        if [[ $# > 2 && $3 == "-m" ]]; then
+            echo "reached"
+            comfort_version="more"
+            else comfort_version="less"
+        fi
+        folder_name=$file_name$comfort_version
         (for i in {3..9}; do
+            url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$comfort_version/$file_name.zip"
+            urls_list+=($url)
+            echo $url
+            wget $url
+            if [[ $? == 0 ]]; then
+                unzip "$file_name.zip"
+                rm -f "$file_name.zip"
+                # cd $file_name # cd $file_name # cd with subprocess won't change shown terminal
+                mv $file_name $folder_name
+                exit 0
+            fi
+        done; exit 1
+        ) || (for i in {3..9}; do
             url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.c"
             urls_list+=($url)
             wget $url
@@ -35,7 +56,7 @@ mkcd () {
                 # cd $file_name # cd $file_name # cd with subprocess won't change shown terminal
                 exit 0
             fi
-        done; exit 1) && cd $file_name && open $file_name.c || echo "Heh, something shid up. Can't find the pset."
+        done; exit 1) && echo $folder_name && cd $folder_name && open $file_name.c || echo "Heh, something shid up. Can't find the pset."
 
         # insert here
     else
