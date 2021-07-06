@@ -92,10 +92,11 @@ check51 () {
         path+="/$comfort_version"
     fi
     for i in $(find . -name "$1.c"); do
-        if [[ $i -ne *"comfort_version"* ]]; then
+        parent_dir="$(dirname -- "$i")"
+        if [[ $parent_dir != *"$comfort_version"* ]]; then
             continue
         fi
-        parent_dir="$(dirname -- "$i")"
+        echo $parent_dir
         echo "cd $parent_dir"
         cd $parent_dir
         echo "check50 $path"
@@ -104,3 +105,10 @@ check51 () {
     done
     cd cwd
 }
+
+# wah () {
+#     string='My long string'
+# if [[ $string == *"My long"* ]]; then
+#   echo "It's there!"
+# fi
+# }
