@@ -81,12 +81,25 @@ int main(int argc, string argv[])
 }
 
 check51 () {
-    cwd=$PWD
+    local cwd=$PWD
+    local comfort_version=""
+    local path=cs50/problems/2021/summer/$1
+    if [[ $# > 1 ]]; then
+        if [[ $2 == "-m" ]] ; then
+            comfort_version="more"
+        else comfort_version="less"
+        fi
+        path+="/$comfort_version"
+    fi
     for i in $(find . -name "$1.c"); do
+        if [[ $i -ne *"comfort_version"* ]]; then
+            continue
+        fi
         parent_dir="$(dirname -- "$i")"
         echo "cd $parent_dir"
         cd $parent_dir
-        check50 cs50/problems/2021/summer/$1
+        echo "check50 $path"
+        check50 $path
         break
     done
     cd cwd
