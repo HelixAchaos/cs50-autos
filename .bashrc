@@ -81,6 +81,7 @@ int main(int argc, string argv[])
 }
 
 check51 () {
+    cd
     local cwd=$PWD
     local comfort_version=""
     local path=cs50/problems/2021/summer/$1
