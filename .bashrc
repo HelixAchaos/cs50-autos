@@ -16,10 +16,12 @@ mkcd () {
     if [[ $# > 1 && $2 == "-wget" ]]; then
         declare -a urls_list=()
         local comfort_version=""
-        if [[ $# > 2 && $3 == "-m" ]]; then
-            echo "reached"
-            comfort_version="more"
+        if [[ $# > 2 ]]; then
+            if [[ $3 == "-m" ]]; then
+                echo "reached"
+                comfort_version="more"
             else comfort_version="less"
+            fi
         fi
         folder_name=$file_name$comfort_version
         (for i in {3..9}; do
