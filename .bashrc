@@ -118,5 +118,5 @@ check51 () {
         check50 $path
         break
     done
-    cd cwd
+    cd $cwd
 }
