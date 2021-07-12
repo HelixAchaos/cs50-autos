@@ -7,17 +7,18 @@
 # }
 
 
+# mkcd (-py|-c) (-wget? (-m|{-l}?))
 mkcd () {
     local cwd=$PWD
     local file_name=$1
     folder_name=$1
     # pset_problem_name wget?
     # mkdir "ps"+$1 // was going to do: p_number, p_prob_name, wget?
-    if [[ $# > 1 && $2 == "-wget" ]]; then
+    if [[ $# > 2 && $3 == "-wget" ]]; then
         declare -a urls_list=()
         local comfort_version=""
-        if [[ $# > 2 ]]; then
-            if [[ $3 == "-m" ]]; then
+        if [[ $# > 3 ]]; then
+            if [[ $4 == "-m" ]]; then
                 echo "reached"
                 comfort_version="more"
             else comfort_version="less"
@@ -65,7 +66,8 @@ mkcd () {
         mkdir $file_name
         echo $file_name
         cd $file_name
-        echo -e "#include <cs50.h>
+        if [[ $2 == "-c" ]]; then
+            echo -e "#include <cs50.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -74,27 +76,37 @@ mkcd () {
 int main(int argc, string argv[])
 {
 
-}"      > $file_name.c
-    open $file_name.c
+}"      > $file_name.c;
+        open $file_name.c
+        else
+            echo -e "" > $file_name.py;
+            open $file_name.py
+        fi
     fi
-
-
     # unset i, file_name
 }
 
+# check51 (file_name) (-py|-c) (-m|{-l?})
 check51 () {
     cd
     local cwd=$PWD
     local comfort_version=""
-    local path=cs50/problems/2021/summer/$1
-    if [[ $# > 1 ]]; then
-        if [[ $2 == "-m" ]] ; then
+    if [[ $2 == "-c" ]]; then
+        local path=cs50/problems/2021/summer/$1
+        local filename=$1.c
+        echo $2
+    else
+        local path=cs50/problems/2021/summer/sentimental/$1
+        local filename=$1.py
+    fi
+    if [[ $# > 2 ]]; then
+        if [[ $3 == "-m" ]] ; then
             comfort_version="more"
         else comfort_version="less"
         fi
         path+="/$comfort_version"
     fi
-    for i in $(find . -name "$1.c"); do
+    for i in $(find . -name $filename); do
         parent_dir="$(dirname -- "$i")"
         if [[ $parent_dir != *"$comfort_version"* ]]; then
             continue
@@ -108,10 +120,3 @@ check51 () {
     done
     cd cwd
 }
-
-# wah () {
-#     string='My long string'
-# if [[ $string == *"My long"* ]]; then
-#   echo "It's there!"
-# fi
-# }
