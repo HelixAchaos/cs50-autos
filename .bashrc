@@ -12,19 +12,18 @@ mkcd () {
     local cwd=$PWD
     local file_name=$1
     folder_name=$1
+    local comfort_version=""
+    if [[ $# > 2 ]]; then
+        if [[ $3 == "-m" ]]; then
+            comfort_version="more"
+        else comfort_version="less"
+        fi
+    fi
+    folder_name=$file_name$comfort_version
     # pset_problem_name wget?
     # mkdir "ps"+$1 // was going to do: p_number, p_prob_name, wget?
-    if [[ $# > 2 && $3 == "-wget" ]]; then
+    if [[ $# > 3 && $4 == "-wget" ]]; then
         declare -a urls_list=()
-        local comfort_version=""
-        if [[ $# > 3 ]]; then
-            if [[ $4 == "-m" ]]; then
-                echo "reached"
-                comfort_version="more"
-            else comfort_version="less"
-            fi
-        fi
-        folder_name=$file_name$comfort_version
         (for i in {3..9}; do
             url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$comfort_version/$file_name.zip"
             urls_list+=($url)
@@ -63,9 +62,8 @@ mkcd () {
 
         # insert here
     else
-        mkdir $file_name
-        echo $file_name
-        cd $file_name
+        mkdir $folder_name
+        cd $folder_name
         if [[ $2 == "-c" ]]; then
             echo -e "#include <cs50.h>
 #include <stdio.h>
