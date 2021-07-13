@@ -31,5 +31,4 @@ Note: This is tested for ide.cs50.io, not for the other service.
 Tasks:
 - [ ] Test/Make version for the GitHub Sandbox
 - [ ] do `mkdir/cd pset{n}` with `mkcd`
-- [ ] Test out `~/ps6/dna/ mkcd dna -wget -py`. -wget fails . `~/ mkcd dna -wget -py && mv /home/ubuntu/dna /home/ubuntu/ps6/dna` works.
 - [ ] wget urls -> {zip|c/py} {$comfort_version, null};   no need to try so many urls
