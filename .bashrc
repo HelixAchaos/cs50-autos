@@ -71,11 +71,40 @@ mkcd () {
         esac)
         # would like a bfs (maybe https://stackoverflow.com/a/23948137), but i doubt any wget folder would have multiple files of the same filename
         echo $file_name
-        for i in $(find . -name $file_name); do
+        (for i in $(find . -name $file_name); do
             echo $i
             open $i
             break
-        done
+            exit 1
+        done) && (case "$@" in
+            *"-c"*)
+                echo -e "#include <cs50.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <math.h>
+
+int main(int argc, string argv[])
+{
+
+}"      > $file_name;
+                open $file_name
+            ;;
+            *"-py"*)
+                echo -e "# This is a sample Python script.
+
+def welcome():
+    print('CS50!')
+
+if __name__ == '__main__':
+    welcome()" > $file_name;
+                open $file_name
+            ;;
+            *)
+                echo "Specify Type!"
+                return 1
+            ;;
+        esac) # used || bc if find is empty, that subprocess be True (exit 0 basically).
         # insert here
     else
         mkdir $folder_name
@@ -95,7 +124,13 @@ int main(int argc, string argv[])
                 open $file_name.c
             ;;
             *"-py"*)
-                echo -e "" > $file_name.py;
+                echo -e "# This is a sample Python script.
+
+def welcome():
+    print('CS50!')
+
+if __name__ == '__main__':
+    welcome()" > $file_name.py;
                 open $file_name.py
             ;;
             *)
