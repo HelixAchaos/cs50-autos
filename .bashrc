@@ -7,7 +7,7 @@
 # }
 
 
-# mkcd (-py|-c) (-wget? (-m|{-l}?))
+# mkcd (-py|-c) (-m|-l) (-wget?)
 mkcd () {
     local cwd=$PWD
     local file_name=$1
@@ -86,8 +86,8 @@ int main(int argc, string argv[])
 
 # check51 (file_name) (-py|-c) (-m|{-l?})
 check51 () {
-    cd
     local cwd=$PWD
+    cd
     local comfort_version=""
     if [[ $2 == "-c" ]]; then
         local path=cs50/problems/2021/summer/$1
@@ -116,5 +116,6 @@ check51 () {
         check50 $path
         break
     done
+    echo $cwd
     cd $cwd
 }
