@@ -7,25 +7,26 @@
 # }
 
 
-# mkcd (-py|-c) (-m|-l) (-wget?)
+# mkcd [file_name] (-py|-c) (-m|-l) (-wget?)
 mkcd () {
     local cwd=$PWD
     local file_name=$1
     folder_name=$1
-    local comfort_version=""
-    if [[ $# > 2 ]]; then
-        if [[ $3 == "-m" ]]; then
-            comfort_version="more"
-        else comfort_version="less"
-        fi
-    fi
+    local comfort_version=$(
+        case "$@" in
+            *"-m"*) echo "more" ;;
+            *"-l"*) echo "less" ;;
+            *) echo "" ;;
+        esac
+    )
     folder_name=$file_name$comfort_version
     # pset_problem_name wget?
     # mkdir "ps"+$1 // was going to do: p_number, p_prob_name, wget?
-    if [[ $# > 3 && $4 == "-wget" ]]; then
+    if [[ $@ == *"-wget"* ]]; then
+        echo "wget"
         declare -a urls_list=()
         (for i in {3..9}; do
-            url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$comfort_version/$file_name.zip"
+            local url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$comfort_version/$file_name.zip"
             urls_list+=($url)
             echo $url
             wget $url
@@ -38,7 +39,7 @@ mkcd () {
             fi
         done; exit 1
         ) || (for i in {3..9}; do
-            url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.c"
+            local url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.c"
             urls_list+=($url)
             wget $url
             if [[ $? -eq 0 ]]; then
@@ -48,7 +49,7 @@ mkcd () {
                 exit 0
             fi
         done; exit 1) || (for i in {3..9}; do
-            url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.zip"
+            local url="https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.zip" # "https://cdn.cs50.net/2020/fall/psets/$i/$file_name/$file_name.zip"
             urls_list+=($url)
             echo $url
             wget $url
@@ -58,14 +59,30 @@ mkcd () {
                 # cd $file_name # cd $file_name # cd with subprocess won't change shown terminal
                 exit 0
             fi
-        done; exit 1) && echo $folder_name && cd $folder_name && open $file_name.c || echo "Heh, something shid up. Can't find the pset."
-
+        done; exit 1) && echo $folder_name && cd $folder_name || echo "Heh, something shid up. Can't find the pset."
+        echo "before -> $file_name"
+        local file_name+=$(case "$@" in
+            *"-c"*)
+                echo ".c"  ;;
+            *"-py"*)
+                echo ".py"  ;;
+            *)
+                echo ""  ;;
+        esac)
+        # would like a bfs (maybe https://stackoverflow.com/a/23948137), but i doubt any wget folder would have multiple files of the same filename
+        echo $file_name
+        for i in $(find . -name $file_name); do
+            echo $i
+            open $i
+            break
+        done
         # insert here
     else
         mkdir $folder_name
         cd $folder_name
-        if [[ $2 == "-c" ]]; then
-            echo -e "#include <cs50.h>
+        case "$@" in
+            *"-c"*)
+                echo -e "#include <cs50.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -75,41 +92,61 @@ int main(int argc, string argv[])
 {
 
 }"      > $file_name.c;
-        open $file_name.c
-        else
-            echo -e "" > $file_name.py;
-            open $file_name.py
-        fi
+                open $file_name.c
+            ;;
+            *"-py"*)
+                echo -e "" > $file_name.py;
+                open $file_name.py
+            ;;
+            *)
+                echo "Specify Type!"
+                return 1
+            ;;
+        esac
     fi
     # unset i, file_name
 }
 
-# check51 (file_name) (-py|-c) (-m|{-l?})
+# check51 [file_name] (-py|-c) (-m|-l)? (-g?)
 check51 () {
     local cwd=$PWD
-    cd
-    local comfort_version=""
-    if [[ $2 == "-c" ]]; then
-        local path=cs50/problems/2021/summer/$1
-        local filename=$1.c
-        echo $2
-    else
-        local path=cs50/problems/2021/summer/sentimental/$1
-        local filename=$1.py
+    if [[ "$@" == *"-g"* ]]; then
+        cd
     fi
-    if [[ $# > 2 ]]; then
-        if [[ $3 == "-m" ]] ; then
-            comfort_version="more"
-        else comfort_version="less"
-        fi
-        path+="/$comfort_version"
+    # may need to be updated seasonly
+    local path=cs50/problems/2021/summer/
+
+    # look into unpacking tuples: https://stackoverflow.com/a/1952480 & https://stackoverflow.com/a/21625045
+    # look into having file extensions added outside a swith-case. if there are many types, it'd get cluttered.->local file_name=$1.matched_arg[1:] # [1:] bc of - before arg
+    case "$@" in
+        *"-c"*)
+            local path+=$1
+            local file_name=$1.c
+        ;;
+        *"-py"*)
+            local path+=sentimental/$1
+            local file_name=$1.py
+        ;;
+        *)
+            echo "Specify Type!"
+            return 1
+        ;;
+    esac
+    local comfort_version=$(
+        case "$@" in
+            *"-m"*) echo "more" ;;
+            *"-l"*) echo "less" ;;
+            *) echo "" ;;
+        esac
+    )
+    if [[ $comfort_version != "" ]]; then
+        path+=/$comfort_version
     fi
-    for i in $(find . -name $filename); do
+    for i in $(find . -name $file_name); do
         parent_dir="$(dirname -- "$i")"
-        if [[ $parent_dir != *"$comfort_version"* ]]; then
+        if [[ $parent_dir != "." && $parent_dir != *"$comfort_version"* ]]; then # if the file is in $cwd
             continue
         fi
-        echo $parent_dir
         echo "cd $parent_dir"
         cd $parent_dir
         echo "check50 $path"
